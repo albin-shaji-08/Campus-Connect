@@ -1,26 +1,12 @@
-# Email Verification Setup Instructions
-
-## ✅ Backend Implementation - DONE
-- ✓ Installed nodemailer
-- ✓ Updated User model with verification fields
-- ✓ Created email service (`backend/utils/emailService.js`)
-- ✓ Updated auth controller with verification logic
-- ✓ Added verification routes
-
-## ✅ Frontend Implementation - DONE
-- ✓ Created VerifyEmail page
-- ✓ Updated App.jsx with verification route
-- ✓ Updated UserRegister to show verification message
-- ✓ Updated UnifiedLogin to handle unverified users and resend email
-
-## 🔧 REQUIRED: Manual Configuration
+## 🔧 Email Service Configuration
 
 ### Step 1: Update .env File
+
 Open `backend/.env` and replace these placeholder values:
 
 ```properties
 EMAIL_USER=your-actual-email@gmail.com
-EMAIL_PASSWORD=your-16-character-app-password
+EMAIL_PASSWORD=your-16-character-app-password-goes-here
 ```
 
 ### Step 2: Generate Gmail App Password
@@ -37,19 +23,22 @@ EMAIL_PASSWORD=your-16-character-app-password
    - Paste it in EMAIL_PASSWORD in your .env file
 
 ### Step 3: Start MongoDB
+
 Make sure MongoDB is running:
+
 ```powershell
 # MongoDB should be running on localhost:27017
 Get-Process mongod  # Check if running
 ```
 
 ### Step 4: Start Application
+
 ```powershell
 # Terminal 1 - Backend
 cd backend
 npm start
 
-# Terminal 2 - Frontend  
+# Terminal 2 - Frontend
 cd frontend
 npm run dev
 ```
@@ -57,6 +46,7 @@ npm run dev
 ## 🧪 Testing the Feature
 
 ### Test Flow:
+
 1. **Register** a new user at http://localhost:3000/register
    - Fill in all details
    - Click "Register"
@@ -105,35 +95,29 @@ User can now login successfully
 ## 🛠️ Troubleshooting
 
 ### Email Not Sending?
+
 - Check EMAIL_USER and EMAIL_PASSWORD in .env
 - Make sure 2FA is enabled on Gmail
 - Use App Password, not regular password
 - Check backend console for error messages
 
 ### Token Expired?
+
 - Tokens expire after 24 hours
 - Use "Resend Verification Email" button on login page
 
 ### Email Goes to Spam?
+
 - Check spam/junk folder
 - Mark as "Not Spam" to improve delivery
 
 ### Can't Login?
+
 - Make sure you verified your email first
 - Check for error message on login page
 - Try resending verification email
 
-## 📧 Email Template Preview
-
-The verification email includes:
-- 🎓 Welcome header with gradient
-- Personalized greeting
-- Clear "Verify Email Address" button
-- Alternative text link
-- 24-hour expiration notice
-- Professional footer
-
-## 🔒 Security Features
+## 🔒 Security Note
 
 - ✓ Tokens expire after 24 hours
 - ✓ One-time use tokens
@@ -145,13 +129,3 @@ The verification email includes:
 
 - Admin logins don't require email verification
 - Only student/organizer registrations need verification
-- Existing users without verification won't be affected (they can still login)
-- To enforce verification for existing users, you'd need a migration script
-
-## 🎉 Success!
-
-Once configured, your CampusConnect application will have:
-- ✅ Secure email verification
-- ✅ Professional welcome emails
-- ✅ Easy resend functionality
-- ✅ Clean user experience
