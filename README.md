@@ -25,22 +25,19 @@
 <table align="center">
   <tr>
     <td align="center" width="33%">
-      <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Locked%20with%20Key.png" alt="Auth" width="50" />
-      <br />
+      <h2 align="center">🔐</h2>
       <b>Multi-Role Auth</b>
       <br />
       Secure login & role-based access for Admins, Organizers & Users
     </td>
     <td align="center" width="33%">
-      <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Calendar.png" alt="Calendar" width="50" />
-      <br />
+      <h2 align="center">📅</h2>
       <b>Event Management</b>
       <br />
       Organizers can effortlessly create, edit, and launch events
     </td>
     <td align="center" width="33%">
-      <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Ticket.png" alt="Ticket" width="50" />
-      <br />
+      <h2 align="center">🎟️</h2>
       <b>Seamless Booking</b>
       <br />
       Users can easily browse and book tickets instantly
@@ -48,22 +45,19 @@
   </tr>
   <tr>
     <td align="center" width="33%">
-      <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Page%20Facing%20Up.png" alt="PDF" width="50" />
-      <br />
+      <h2 align="center">📄</h2>
       <b>PDF Ticket Generation</b>
       <br />
       Automatic dynamic PDF tickets generated using PDFKit
     </td>
     <td align="center" width="33%">
-      <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Alarm%20Clock.png" alt="Reminder" width="50" />
-      <br />
+      <h2 align="center">⏰</h2>
       <b>Automated Reminders</b>
       <br />
       Cron jobs ensure attendees never miss an event
     </td>
     <td align="center" width="33%">
-      <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Bar%20Chart.png" alt="Dashboard" width="50" />
-      <br />
+      <h2 align="center">📊</h2>
       <b>Admin Dashboard</b>
       <br />
       Powerful data analytics (Recharts) & CSV export options
