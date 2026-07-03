@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getEventRegistrations } from '../api/registration';
 import axios from 'axios';
 import { motion } from 'framer-motion';
+import { toInputValue } from '../utils/date';
 import { FiEdit2, FiTrash2, FiCalendar, FiMapPin, FiDollarSign } from 'react-icons/fi';
 import toast, { Toaster } from 'react-hot-toast';
 import { FaTicketAlt } from 'react-icons/fa';
@@ -9,18 +12,22 @@ function AdminEvents() {
   const BASE = import.meta.env.VITE_BASE_URL || 'http://localhost:5000';
   const [events, setEvents] = useState([]);
   const [form, setForm] = useState({
-    name: '',
+    title: '',
     description: '',
-    location: '',
+    venue: '',
     date: '',
-    ticketPrice: '',
-    availableTickets: '',
+    registrationClosesAt: '',
+    maxParticipants: '',
     image: null,
     _id: null
   });
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState('');
+  const [showRegistrations, setShowRegistrations] = useState(null); // eventId or null
+  const [registrations, setRegistrations] = useState([]);
+  const [regLoading, setRegLoading] = useState(false);
+  const navigate = useNavigate();
 
   const fetchEvents = async () => {
     try {
@@ -53,6 +60,22 @@ function AdminEvents() {
       } else {
         setImagePreview('');
       }
+    } else if (e.target.name === 'date') {
+      const newDate = e.target.value;
+      // When date changes, update registrationClosesAt to match it if it's empty or exceeds new date
+      const updates = { date: newDate };
+      if (!form.registrationClosesAt || form.registrationClosesAt > newDate) {
+        updates.registrationClosesAt = newDate;
+      }
+      setForm({ ...form, ...updates });
+    } else if (e.target.name === 'registrationClosesAt') {
+      const closingTime = e.target.value;
+      // Validate that closing time doesn't exceed event date
+      if (form.date && closingTime > form.date) {
+        toast.error('Registration closing time cannot be after event time');
+        return;
+      }
+      setForm({ ...form, [e.target.name]: closingTime });
     } else {
       setForm({ ...form, [e.target.name]: e.target.value });
     }
@@ -60,6 +83,13 @@ function AdminEvents() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate registration closing time
+    if (form.registrationClosesAt && form.date && form.registrationClosesAt > form.date) {
+      toast.error('Registration closing time must be before event time');
+      return;
+    }
+    
     setLoading(true);
 
     const formData = new FormData();
@@ -93,12 +123,12 @@ function AdminEvents() {
 
   const resetForm = () => {
     setForm({
-      name: '',
+      title: '',
       description: '',
-      location: '',
+      venue: '',
       date: '',
-      ticketPrice: '',
-      availableTickets: '',
+      registrationClosesAt: '',
+      maxParticipants: '',
       image: null,
       _id: null
     });
@@ -108,7 +138,11 @@ function AdminEvents() {
 
   const handleEdit = (event) => {
     setEditing(true);
-    setForm({ ...event, image: null });
+    // convert stored ISO date to datetime-local input value
+    const copy = { ...event, image: null };
+    copy.date = toInputValue(event.date);
+    copy.registrationClosesAt = toInputValue(event.registrationClosesAt);
+    setForm(copy);
     setImagePreview(`${BASE}/${event.image}`);
     window.scrollTo({
       top: 0,
@@ -156,34 +190,34 @@ function AdminEvents() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Event Name</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Event Title</label>
                   <input
-                    name="name"
-                    value={form.name}
+                    name="title"
+                    value={form.title}
                     onChange={handleChange}
-                    placeholder="Enter event name"
+                    placeholder="Enter event title"
                     required
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Venue</label>
                   <input
-                    name="location"
-                    value={form.location}
+                    name="venue"
+                    value={form.venue}
                     onChange={handleChange}
-                    placeholder="Enter location"
+                    placeholder="Enter venue"
                     required
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Date & time</label>
                   <input
                     name="date"
-                    type="date"
+                    type="datetime-local"
                     value={form.date}
                     onChange={handleChange}
                     required
@@ -192,29 +226,32 @@ function AdminEvents() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Ticket Price (₹)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Registration Closes At</label>
                   <input
-                    name="ticketPrice"
-                    type="number"
-                    value={form.ticketPrice}
+                    name="registrationClosesAt"
+                    type="datetime-local"
+                    value={form.registrationClosesAt}
                     onChange={handleChange}
-                    placeholder="Enter price"
+                    max={form.date}
                     required
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                   />
+                  <p className="text-xs text-gray-500 mt-1">Registration will close at this time</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Available Tickets</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Maximum Participants</label>
                   <input
-                    name="availableTickets"
+                    name="maxParticipants"
                     type="number"
-                    value={form.availableTickets}
+                    min="1"
+                    value={form.maxParticipants}
                     onChange={handleChange}
-                    placeholder="Enter ticket quantity"
+                    placeholder="Enter max participants"
                     required
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                   />
+                  <p className="text-xs text-gray-500 mt-1">Maximum number of students who can register</p>
                 </div>
 
                 <div>
@@ -248,19 +285,10 @@ function AdminEvents() {
               </div>
 
               <div className="flex justify-end space-x-3 pt-2">
-                {editing && (
-                  <button
-                    type="button"
-                    onClick={resetForm}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-all"
-                  >
-                    Cancel
-                  </button>
-                )}
                 <button
                   type="submit"
+                  className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-2 rounded-lg font-medium shadow-md hover:from-purple-700 hover:to-indigo-700 transition-all"
                   disabled={loading}
-                  className={`px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium rounded-md hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all ${loading ? 'opacity-70' : ''}`}
                 >
                   {loading ? (
                     <span className="flex items-center justify-center">
@@ -297,19 +325,21 @@ function AdminEvents() {
             ) : (
               <div className="grid grid-cols-1 gap-4">
                 {events.map((event) => (
-                  <div key={event._id} className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                  <div key={event._id} className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                    onClick={() => navigate(`/event/${event._id}`)}
+                  >
                     <div className="p-4">
                       <div className="flex items-start space-x-4">
                         <div className="flex-shrink-0">
                           <img
                             className="h-20 w-20 rounded-md object-cover"
                             src={`${BASE}/${event.image}`}
-                            alt={event.name}
+                            alt={event.title}
                           />
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-medium text-gray-900">{event.name}</h3>
-                          <p className="text-sm text-gray-500">{event.location}</p>
+                          <h3 className="font-medium text-gray-900">{event.title}</h3>
+                          <p className="text-sm text-gray-500">{event.venue}</p>
 
                           <div className="mt-2 space-y-1">
                             <div className="flex items-center text-sm text-gray-600">
@@ -317,33 +347,80 @@ function AdminEvents() {
                               <span>{formatDate(event.date)}</span>
                             </div>
                             <div className="flex items-center text-sm text-gray-600">
-                              <FiDollarSign className="mr-2 text-purple-500" />
-                              <span>₹{event.ticketPrice}</span>
                             </div>
-                            <div className="flex items-center text-sm text-gray-600">
-                              <FaTicketAlt className="mr-2 text-purple-500" />
-                              <span>{event.availableTickets} tickets available</span>
-                            </div>
+
                           </div>
                         </div>
                       </div>
 
                       <div className="mt-4 flex justify-end space-x-2">
                         <button
-                          onClick={() => handleEdit(event)}
+                          onClick={e => { e.stopPropagation(); handleEdit(event); }}
                           className="p-2 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-colors"
                           title="Edit"
                         >
                           <FiEdit2 />
                         </button>
                         <button
-                          onClick={() => handleDelete(event._id)}
+                          onClick={e => { e.stopPropagation(); handleDelete(event._id); }}
                           className="p-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors"
                           title="Delete"
                         >
                           <FiTrash2 />
                         </button>
+                        <button
+                          onClick={async e => {
+                            e.stopPropagation();
+                            setShowRegistrations(event._id);
+                            setRegLoading(true);
+                            try {
+                              const regs = await getEventRegistrations(event._id, BASE);
+                              setRegistrations(regs);
+                            } catch {
+                              setRegistrations([]);
+                            }
+                            setRegLoading(false);
+                          }}
+                          className="p-2 bg-green-100 text-green-700 rounded-md hover:bg-green-200 transition-colors"
+                          title="Show Registrations"
+                        >
+                          <FaTicketAlt />
+                        </button>
                       </div>
+                      {showRegistrations === event._id && (
+                        <div className="mt-4 bg-gray-50 border border-gray-200 rounded p-3">
+                          <h4 className="font-semibold mb-2 text-gray-700">Registered Students</h4>
+                          {regLoading ? (
+                            <div className="text-gray-500">Loading...</div>
+                          ) : registrations.length === 0 ? (
+                            <div className="text-gray-400">No registrations</div>
+                          ) : (
+                            <div className="overflow-x-auto">
+                              <table className="min-w-full text-sm">
+                                <thead className="bg-gray-100">
+                                  <tr>
+                                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-600">Name</th>
+                                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-600">Email</th>
+                                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-600">Department</th>
+                                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-600">Student ID</th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-200">
+                                  {registrations.map((reg, idx) => (
+                                    <tr key={reg._id || reg.student_id?._id || idx} className="hover:bg-gray-50">
+                                      <td className="px-3 py-2 text-gray-700">{reg.student_id?.name || 'Unknown'}</td>
+                                      <td className="px-3 py-2 text-gray-600">{reg.student_id?.email || 'No email'}</td>
+                                      <td className="px-3 py-2 text-gray-600">{reg.student_id?.dept || 'N/A'}</td>
+                                      <td className="px-3 py-2 text-gray-600 font-mono">{reg.student_id?.student_id || 'N/A'}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          )}
+                          <button onClick={e => { e.stopPropagation(); setShowRegistrations(null); }} className="mt-2 text-xs text-purple-600 hover:underline">Close</button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -363,19 +440,23 @@ function AdminEvents() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {events.map((event) => (
-                  <tr key={event._id} className="hover:bg-gray-50 transition-colors duration-150">
+                  <React.Fragment key={event._id}>
+                  <tr
+                    className="hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
+                    onClick={() => navigate(`/event/${event._id}`)}
+                  >
                     <td className="px-6 py-4">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-16 w-16">
                           <img
                             className="h-16 w-16 rounded-md object-cover"
                             src={`${BASE}/${event.image}`}
-                            alt={event.name}
+                            alt={event.title}
                           />
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{event.name}</div>
-                          <div className="text-sm text-gray-500">{event.location}</div>
+                          <div className="text-sm font-medium text-gray-900">{event.title}</div>
+                          <div className="text-sm text-gray-500">{event.venue}</div>
                         </div>
                       </div>
                     </td>
@@ -385,35 +466,82 @@ function AdminEvents() {
                           <FiCalendar className="mr-2 text-purple-500" />
                           {formatDate(event.date)}
                         </div>
-                        <div className="flex items-center mb-1">
-                          <FiDollarSign className="mr-2 text-purple-500" />
-                          ₹{event.ticketPrice}
-                        </div>
-                        <div className="flex items-center">
-                          <FaTicketAlt className="mr-2 text-purple-500" />
-                          {event.availableTickets} tickets available
-                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <div className="flex space-x-2">
                         <button
-                          onClick={() => handleEdit(event)}
+                          onClick={e => { e.stopPropagation(); handleEdit(event); }}
                           className="p-2 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200 transition-colors"
                           title="Edit"
                         >
                           <FiEdit2 />
                         </button>
                         <button
-                          onClick={() => handleDelete(event._id)}
+                          onClick={e => { e.stopPropagation(); handleDelete(event._id); }}
                           className="p-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors"
                           title="Delete"
                         >
                           <FiTrash2 />
                         </button>
+                        <button
+                          onClick={async e => {
+                            e.stopPropagation();
+                            setShowRegistrations(event._id);
+                            setRegLoading(true);
+                            try {
+                              const regs = await getEventRegistrations(event._id, BASE);
+                              setRegistrations(regs);
+                            } catch {
+                              setRegistrations([]);
+                            }
+                            setRegLoading(false);
+                          }}
+                          className="p-2 bg-green-100 text-green-700 rounded-md hover:bg-green-200 transition-colors"
+                          title="Show Registrations"
+                        >
+                          <FaTicketAlt />
+                        </button>
                       </div>
                     </td>
                   </tr>
+                  {showRegistrations === event._id && (
+                    <tr>
+                      <td colSpan={3} className="bg-gray-50 border border-gray-200 rounded p-3">
+                        <h4 className="font-semibold mb-2 text-gray-700">Registered Students</h4>
+                        {regLoading ? (
+                          <div className="text-gray-500">Loading...</div>
+                        ) : registrations.length === 0 ? (
+                          <div className="text-gray-400">No registrations</div>
+                        ) : (
+                          <div className="overflow-x-auto">
+                            <table className="min-w-full text-sm">
+                              <thead className="bg-gray-100">
+                                <tr>
+                                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-600">Name</th>
+                                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-600">Email</th>
+                                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-600">Department</th>
+                                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-600">Student ID</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-gray-200">
+                                {registrations.map((reg, idx) => (
+                                  <tr key={reg._id || reg.student_id?._id || idx} className="hover:bg-gray-50">
+                                    <td className="px-3 py-2 text-gray-700">{reg.student_id?.name || 'Unknown'}</td>
+                                    <td className="px-3 py-2 text-gray-600">{reg.student_id?.email || 'No email'}</td>
+                                    <td className="px-3 py-2 text-gray-600">{reg.student_id?.dept || 'N/A'}</td>
+                                    <td className="px-3 py-2 text-gray-600 font-mono">{reg.student_id?.student_id || 'N/A'}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                        <button onClick={e => { e.stopPropagation(); setShowRegistrations(null); }} className="mt-2 text-xs text-purple-600 hover:underline">Close</button>
+                      </td>
+                    </tr>
+                  )}
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>

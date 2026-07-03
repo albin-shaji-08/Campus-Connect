@@ -11,8 +11,14 @@ const adminMiddleware = require('../middleware/adminMiddleware');
 // POST /api/users/profile-pic
 router.post('/profile-pic', userMiddleware, upload.single('profilePic'), updateProfilePic);
 router.get('/profile', authMiddleware, getProfile);
-router.get('/', adminMiddleware, getAllUsers);
-router.delete('/:id', adminMiddleware, deleteUser);
+router.get('/', authMiddleware, adminMiddleware, getAllUsers);
+router.delete('/:id', authMiddleware, adminMiddleware, deleteUser);
 router.put('/profile-pic', authMiddleware, upload.single('profilePic'), updateProfilePic);
+
+// Admin: create organizer
+router.post('/organizer', authMiddleware, adminMiddleware, (req, res, next) => {
+	// delegate to controller
+	next();
+}, require('../controllers/userController').createOrganizer);
 
 module.exports = router;

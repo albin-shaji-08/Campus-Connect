@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import toast, { Toaster } from 'react-hot-toast';
-import { FiCamera, FiMail, FiUser, FiCalendar } from 'react-icons/fi';
+import { FiCamera, FiMail, FiUser, FiCalendar, FiBook, FiCreditCard } from 'react-icons/fi';
 
 function Profile() {
   const [user, setUser] = useState(null);
@@ -119,10 +119,34 @@ function Profile() {
                 <FiUser className="text-purple-600 text-xl" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Username</p>
-                <p className="font-medium">{user?.username || 'Not set'}</p>
+                <p className="text-sm text-gray-500">Name</p>
+                <p className="font-medium">{user?.name || 'Not set'}</p>
               </div>
             </div>
+
+            {user?.dept && (
+              <div className="flex items-center space-x-4">
+                <div className="bg-purple-100 p-3 rounded-full">
+                  <FiBook className="text-purple-600 text-xl" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Department</p>
+                  <p className="font-medium">{user.dept}</p>
+                </div>
+              </div>
+            )}
+
+            {user?.student_id && (
+              <div className="flex items-center space-x-4">
+                <div className="bg-purple-100 p-3 rounded-full">
+                  <FiCreditCard className="text-purple-600 text-xl" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Student ID</p>
+                  <p className="font-medium font-mono">{user.student_id}</p>
+                </div>
+              </div>
+            )}
 
             <div className="flex items-center space-x-4">
               <div className="bg-purple-100 p-3 rounded-full">

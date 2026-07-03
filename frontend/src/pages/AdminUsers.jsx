@@ -22,9 +22,9 @@ function AdminUsers() {
 
   const fetchUsers = async () => {
     setLoading(true);
-    try {
-      const res = await axios.get(`${BASE}/api/users`, { withCredentials: true });
-      setUsers(res.data);
+  try {
+  const res = await axios.get(`${BASE}/api/users?role=student`, { withCredentials: true });
+  setUsers(res.data);
     } catch (err) {
       console.error('Failed to fetch users:', err.message);
       toast.error('Failed to load users');
@@ -114,6 +114,12 @@ function AdminUsers() {
                   Email
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-violet-800 uppercase tracking-wider">
+                  Department
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-violet-800 uppercase tracking-wider">
+                  Student ID
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-violet-800 uppercase tracking-wider">
                   Joined
                 </th>
                 <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-violet-800 uppercase tracking-wider">
@@ -153,6 +159,16 @@ function AdminUsers() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {user.dept || 'N/A'}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900 font-mono">
+                        {user.student_id || 'N/A'}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <FiCalendar className="flex-shrink-0 mr-2 text-gray-400" />
                         <div className="text-sm text-gray-500">
@@ -174,7 +190,7 @@ function AdminUsers() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="4" className="px-6 py-4 text-center text-sm text-gray-500">
+                  <td colSpan="6" className="px-6 py-4 text-center text-sm text-gray-500">
                     {searchTerm ? 'No matching users found' : 'No users available'}
                   </td>
                 </tr>

@@ -7,10 +7,9 @@ function Footer() {
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-10">
         {/* About */}
         <div>
-          <h3 className="text-xl font-semibold text-white mb-4">Event Ticket Booking</h3>
+          <h3 className="text-xl font-semibold text-white mb-4">Campus Connect</h3>
           <p className="text-sm text-gray-400">
-            Your one-stop platform to explore, book and enjoy amazing events happening around you.
-            Simple, fast and secure ticketing experience.
+            Campus Connect is a web-based application designed for managing departmental events within a single institution. The platform allows department coordinators to post events such as workshops, seminars, or cultural programs, and enables students to view and register for them online.
           </p>
         </div>
 
@@ -31,32 +30,32 @@ function Footer() {
           <ul className="text-sm space-y-2">
             <li className="flex items-center gap-2">
               <FiMail className="text-purple-400" />
-              <span>support@eventticketbooking.com</span>
+              <span>support@campusconnect.com</span>
             </li>
             <li className="flex items-center gap-2">
               <FiPhone className="text-purple-400" />
-              <span>+91 98765 43210</span>
+              <span>+91 98699878369</span>
             </li>
             <li className="flex items-center gap-2">
               <FiMapPin className="text-purple-400" />
-              <span>Bengaluru, India</span>
+              <span>Palai, India</span>
             </li>
           </ul>
 
           {/* Social */}
           <div className="mt-4 flex gap-4 text-xl text-gray-400">
             <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-white"><FiTwitter /></a>
-            <a href="https://www.instagram.com/busy_sohail?igsh=MWU1MHVpMTUzNmdwNQ==" target="_blank" rel="noopener noreferrer" className="hover:text-white"><FiInstagram /></a>
-            <a href="https://www.linkedin.com/in/syedsohail7867/" target="_blank" rel="noopener noreferrer" className="hover:text-white"><FiLinkedin /></a>
+            <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white"><FiInstagram /></a>
+            <a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white"><FiLinkedin /></a>
           </div>
         </div>
       </div>
 
       {/* Bottom */}
       <div className="text-center text-sm text-gray-500 mt-10 border-t border-gray-700 pt-4">
-        &copy; {new Date().getFullYear()} Digisnare. All rights reserved.
+        &copy; {new Date().getFullYear()} All rights reserved.
         <br />
-        Developed by Syed Sohail with ❤️
+        Carpe Diem ❤️
       </div>
     </footer>
   );

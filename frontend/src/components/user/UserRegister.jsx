@@ -10,13 +10,14 @@ function UserRegister() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
+  const [dept, setDept] = useState('');
+  const [studentId, setStudentId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const BASE = import.meta.env.VITE_BASE_URL || 'http://localhost:5000';
 
   const handleRegister = async (e) => {
     e.preventDefault();
-//     setError('');
     setIsLoading(true);
 
     if (password !== confirm) {
@@ -24,17 +25,40 @@ function UserRegister() {
       setIsLoading(false);
       return;
     }
+    if (!name || !email || !dept) {
+      toast.error('Please fill all required fields');
+      setIsLoading(false);
+      return;
+    }
+    if (!studentId) {
+      toast.error('Student ID is required');
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const res = await axios.post(
         `${BASE}/api/auth/register`,
-        { name, email, password, confirmPassword: confirm },
+        {
+          // user_id will be generated in backend
+          name,
+          email,
+          password,
+          confirmPassword: confirm,
+          role: 'student',
+          dept,
+          student_id: studentId
+        },
         { withCredentials: true }
       );
 
       if (res.status === 201) {
-        toast.success('Registration successful! Please login.');
-        setTimeout(() => navigate('/login'), 1500);
+        if (res.data.emailSent) {
+          toast.success('Registration successful! Please check your email to verify your account.', { duration: 5000 });
+        } else {
+          toast.success('Registration successful but email failed. Please use resend option on login.', { duration: 5000 });
+        }
+        setTimeout(() => navigate('/login'), 2000);
       }
     } catch (err) {
       toast.error(err.response?.data?.msg || 'Registration failed');
@@ -67,11 +91,12 @@ function UserRegister() {
 
           {/* Form */}
           <div className="p-6 sm:p-8">
+
             <form onSubmit={handleRegister} className="space-y-4">
+
+              {/* Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Full Name
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <FiUser className="text-gray-400" />
@@ -86,11 +111,9 @@ function UserRegister() {
                   />
                 </div>
               </div>
-
+              {/* Email */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email Address
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <FiMail className="text-gray-400" />
@@ -104,6 +127,31 @@ function UserRegister() {
                     required
                   />
                 </div>
+              </div>
+              {/* Role selection removed: only students can sign up */}
+              {/* Department */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
+                <input
+                  type="text"
+                  value={dept}
+                  onChange={e => setDept(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  placeholder="Department"
+                  required
+                />
+              </div>
+              {/* Student ID (required) */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Student ID</label>
+                <input
+                  type="text"
+                  value={studentId}
+                  onChange={e => setStudentId(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  placeholder="Student ID"
+                  required
+                />
               </div>
 
               <div>

@@ -15,6 +15,7 @@ import { BsThreeDotsVertical, BsArrowUpRight } from 'react-icons/bs';
 import { IoRefreshOutline } from 'react-icons/io5';
 import { FaTicketAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 function AdminDashboard() {
   const [stats, setStats] = useState(null);
@@ -24,8 +25,10 @@ function AdminDashboard() {
   const BASE = import.meta.env.VITE_BASE_URL || 'http://localhost:5000';
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
+  const { role } = useAuth();
   
   const fetchUsers = async () => {
+    if (role !== 'admin') return;
     setLoading(true);
     try {
       const res = await axios.get(`${BASE}/api/users`, { withCredentials: true });
@@ -39,6 +42,7 @@ function AdminDashboard() {
 
   useEffect(() => {
     const fetchStats = async () => {
+      if (role !== 'admin') return;
       try {
         setLoading(true);
         const res = await axios.get(`${BASE}/api/dashboard/stats`, {
@@ -57,7 +61,7 @@ function AdminDashboard() {
 
     fetchStats();
     fetchUsers();
-  }, [timeRange]);
+  }, [timeRange, role]);
 
   const chartData = stats
     ? [

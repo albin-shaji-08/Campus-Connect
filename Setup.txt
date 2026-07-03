@@ -20,9 +20,17 @@ run command "npm run dev"
 To run the backend  
 goto backend and open CMD in same path,
 run command "npm install" //this will install all the dependencies
-run command "nodemon i"
+##run command "nodemon i"
+ npx nodemon index.js    
 
 DONE
 
 email = 'admin@email.com'
 password = 'admin@123'
+
+#-----Credentilas------#
+- Admin -:
+            admin@email.com - admin@123
+- Organizers -:
+            csclub@email.com - password
+            artsclub@email.com - password

@@ -60,7 +60,7 @@ export default function Navbar() {
               className="text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent"
               onClick={closeMobileMenu}
             >
-              {role === 'admin' ? 'Event Admin' : 'Event Ticket Booking'}
+              {role === 'admin' ? 'Event Admin' : 'Campus Connect'}
             </Link>
           </motion.div>
 
@@ -76,16 +76,13 @@ export default function Navbar() {
               </motion.div>
             )}
 
-            {role === 'user' && (
+            {role === 'student' && (
               <>
                 <motion.div variants={linkVariants} whileHover="hover" whileTap="tap">
-                  <Link to="/my-tickets" className="text-gray-700 font-medium">My Tickets</Link>
+                  <Link to="/my-events" className="text-gray-700 font-medium">My Events</Link>
                 </motion.div>
                 <motion.div variants={linkVariants} whileHover="hover" whileTap="tap">
                   <Link to="/profile" className="text-gray-700 font-medium">Profile</Link>
-                </motion.div>
-                <motion.div variants={linkVariants} whileHover="hover" whileTap="tap">
-                  <Link to="/contact" className="text-gray-700 font-medium">Contact</Link>
                 </motion.div>
                 <motion.div variants={linkVariants} whileHover="hover" whileTap="tap">
                   <button onClick={logout} className="text-red-500 font-medium">Logout</button>
@@ -99,10 +96,10 @@ export default function Navbar() {
                   <Link to="/admin/dashboard" className="text-gray-700 font-medium">Dashboard</Link>
                 </motion.div>
                 <motion.div variants={linkVariants} whileHover="hover" whileTap="tap">
-                  <Link to="/admin/users" className="text-gray-700 font-medium">Users</Link>
+                  <Link to="/admin/organizers" className="text-gray-700 font-medium">Clubs/Organizers</Link>
                 </motion.div>
                 <motion.div variants={linkVariants} whileHover="hover" whileTap="tap">
-                  <Link to="/admin/tickets" className="text-gray-700 font-medium">Tickets</Link>
+                  <Link to="/admin/users" className="text-gray-700 font-medium">Users</Link>
                 </motion.div>
                 <motion.div variants={linkVariants} whileHover="hover" whileTap="tap">
                   <Link to="/admin/messages" className="text-gray-700 font-medium">Messages</Link>
@@ -111,21 +108,38 @@ export default function Navbar() {
                   <Link to="/admin/events" className="text-gray-700 font-medium">Events</Link>
                 </motion.div>
                 <motion.div variants={linkVariants} whileHover="hover" whileTap="tap">
-                  <Link to="/admin/banners" className="text-gray-700 font-medium">Banners</Link>
-                </motion.div>
-                <motion.div variants={linkVariants} whileHover="hover" whileTap="tap">
                   <button onClick={logout} className="text-red-500 font-medium">Logout</button>
                 </motion.div>
               </>
             )}
 
+              {role === 'organizer' && (
+                <>
+                  <motion.div variants={linkVariants} whileHover="hover" whileTap="tap">
+                    <Link to="/dashboard" className="text-gray-700 font-medium">Dashboard</Link>
+                  </motion.div>
+                  <motion.div variants={linkVariants} whileHover="hover" whileTap="tap">
+                    <Link to="/events/create" className="text-gray-700 font-medium">Create Event</Link>
+                  </motion.div>
+                  <motion.div variants={linkVariants} whileHover="hover" whileTap="tap">
+                    <Link to="/organizer/events" className="text-gray-700 font-medium">My Events</Link>
+                  </motion.div>
+                  <motion.div variants={linkVariants} whileHover="hover" whileTap="tap">
+                    <Link to="/profile" className="text-gray-700 font-medium">Profile</Link>
+                  </motion.div>
+                  <motion.div variants={linkVariants} whileHover="hover" whileTap="tap">
+                    <button onClick={logout} className="text-red-500 font-medium">Logout</button>
+                  </motion.div>
+                </>
+              )}
+
             {!role && (
               <>
                 <motion.div variants={linkVariants} whileHover="hover" whileTap="tap">
-                  <Link to="/login" className="text-gray-700 font-medium">User Login</Link>
+                  <Link to="/login" className="text-gray-700 font-medium">Login</Link>
                 </motion.div>
                 <motion.div variants={linkVariants} whileHover="hover" whileTap="tap">
-                  <Link to="/admin/login" className="text-gray-700 font-medium">Admin Login</Link>
+                  <Link to="/register" className="text-gray-700 font-medium">Signup</Link>
                 </motion.div>
               </>
             )}
@@ -176,7 +190,7 @@ export default function Navbar() {
                   </motion.div>
                 )}
 
-                {role === 'user' && (
+                {role === 'student' && (
                   <>
                     <motion.div 
                       whileHover={{ backgroundColor: '#f3f4f6' }}
@@ -334,6 +348,65 @@ export default function Navbar() {
                   </>
                 )}
 
+                {role === 'organizer' && (
+                  <>
+                    <motion.div 
+                      whileHover={{ backgroundColor: '#f3f4f6' }}
+                      whileTap={{ scale: 0.98 }}
+                      className="px-3 py-2 rounded-md"
+                    >
+                      <Link 
+                        to="/dashboard" 
+                        className="text-gray-700 font-medium block w-full"
+                        onClick={closeMobileMenu}
+                      >
+                        Dashboard
+                      </Link>
+                    </motion.div>
+                    <motion.div 
+                      whileHover={{ backgroundColor: '#f3f4f6' }}
+                      whileTap={{ scale: 0.98 }}
+                      className="px-3 py-2 rounded-md"
+                    >
+                      <Link 
+                        to="/events/create" 
+                        className="text-gray-700 font-medium block w-full"
+                        onClick={closeMobileMenu}
+                      >
+                        Create Event
+                      </Link>
+                    </motion.div>
+                    <motion.div 
+                      whileHover={{ backgroundColor: '#f3f4f6' }}
+                      whileTap={{ scale: 0.98 }}
+                      className="px-3 py-2 rounded-md"
+                    >
+                      <Link 
+                        to="/organizer/events" 
+                        className="text-gray-700 font-medium block w-full"
+                        onClick={closeMobileMenu}
+                      >
+                        My Events
+                      </Link>
+                    </motion.div>
+                    <motion.div 
+                      whileHover={{ backgroundColor: '#f3f4f6' }}
+                      whileTap={{ scale: 0.98 }}
+                      className="px-3 py-2 rounded-md"
+                    >
+                      <button 
+                        onClick={() => {
+                          closeMobileMenu();
+                          logout();
+                        }} 
+                        className="text-red-500 font-medium block w-full text-left"
+                      >
+                        Logout
+                      </button>
+                    </motion.div>
+                  </>
+                )}
+
                 {!role && (
                   <>
                     <motion.div 
@@ -346,7 +419,7 @@ export default function Navbar() {
                         className="text-gray-700 font-medium block w-full"
                         onClick={closeMobileMenu}
                       >
-                        User Login
+                        Login
                       </Link>
                     </motion.div>
                     <motion.div 
@@ -355,11 +428,11 @@ export default function Navbar() {
                       className="px-3 py-2 rounded-md"
                     >
                       <Link 
-                        to="/admin/login" 
+                        to="/register" 
                         className="text-gray-700 font-medium block w-full"
                         onClick={closeMobileMenu}
                       >
-                        Admin Login
+                        Signup
                       </Link>
                     </motion.div>
                   </>

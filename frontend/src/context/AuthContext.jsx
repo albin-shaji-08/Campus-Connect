@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const AuthContext = createContext();
 
@@ -21,11 +22,27 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    // Clear role from localStorage
     localStorage.removeItem('role');
-    navigate('/'); // Redirect to home on logout
-    toast.success('Logged out successfully');
-    document.cookie = 'token=; Max-Age=0';
+    
+    // Clear any stored tokens
+    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
+    
+    // Clear cookie
+    document.cookie = 'token=; Max-Age=0; path=/';
+    
+    // Clear axios default headers
+    delete axios.defaults.headers.common['Authorization'];
+    
+    // Update state
     setRole(null);
+    
+    // Show success message
+    toast.success('Logged out successfully');
+    
+    // Redirect to home
+    navigate('/');
   };
 
   return (
